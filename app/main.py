@@ -21,7 +21,7 @@ app.include_router(admin_router)
 app.include_router(ws_router)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://votapp-frontend.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
