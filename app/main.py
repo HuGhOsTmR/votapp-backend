@@ -9,6 +9,8 @@ from app.api.admin_api import router as admin_router
 from app.api.ws_api import router as ws_router
 
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import assembly_api, motion_api
+
 
 
 app = FastAPI(
@@ -26,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+app.include_router(assembly_api.router)
+app.include_router(motion_api.router)
 @app.get("/")
 def home():
 
