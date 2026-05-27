@@ -7,19 +7,10 @@ from app.api.auth_api import router as auth_router
 from app.api.admin_api import router as admin_router
 
 from app.api.ws_api import router as ws_router
-from fastapi import FastAPI
+
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
 
-# ✅ CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 👈 luego lo ajustamos
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 app = FastAPI(
     title="VotApp API",
     version="1.0.0"
