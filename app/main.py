@@ -11,7 +11,9 @@ from app.api.ws_api import router as ws_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import assembly_api, motion_api
 
+from app.core.database import Base, engine
 
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="VotApp API",
@@ -36,6 +38,8 @@ app.add_middleware(
 )
 app.include_router(assembly_api.router)
 app.include_router(motion_api.router)
+
+
 @app.get("/")
 def home():
 
