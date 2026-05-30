@@ -78,3 +78,4 @@ class User(Base):
     )
 
     group = relationship("Group")
+    memberships = relationship("Membership", backref="user")
