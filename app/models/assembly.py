@@ -60,3 +60,4 @@ class Assembly(Base):
         "Group",
         back_populates="assembly"
     )
+    memberships = relationship("Membership", backref="assembly")
