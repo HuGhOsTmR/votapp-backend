@@ -21,9 +21,15 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(ws_router)
+origins = [
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://votapp-frontend.vercel.app"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://votapp-frontend.vercel.app"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
