@@ -3,7 +3,7 @@ from app.core.connection_manager import ConnectionManager
 from app.core.security import verify_token
 from app.services.auth_service import get_user_by_id
 from app.core.database import SessionLocal
-
+from app.models.membership import Membership
 from app.models.assembly import Assembly
 from app.models.motion import Motion
 from app.models.vote import Vote
@@ -56,7 +56,15 @@ async def websocket_endpoint(websocket: WebSocket, assembly_id: str):
         if not user:
             await websocket.close()
             return
-
+            
+        membership = db.query(Membership).filter(
+            Membership.user_id == user.id,
+            Membership.assembly_id == assembly_uuid
+        ).first()
+        
+        if not membership:
+            await websocket.close()
+            return
         # =========================
         # 🔌 CONECTAR
         # =========================
@@ -108,7 +116,7 @@ async def websocket_endpoint(websocket: WebSocket, assembly_id: str):
             # =========================
             elif msg_type == "start_motion":
 
-                if user.role != UserRole.ADMIN:
+                if membership.role != "PRESIDENT":
                     await websocket.send_json({
                         "type": "error",
                         "message": "Solo ADMIN"
@@ -157,7 +165,7 @@ async def websocket_endpoint(websocket: WebSocket, assembly_id: str):
             # =========================
             elif msg_type == "close_motion":
 
-                if user.role != UserRole.ADMIN:
+                if membership.role != "PRESIDENT":
                     await websocket.send_json({
                         "type": "error",
                         "message": "Solo ADMIN"
@@ -298,10 +306,7 @@ async def websocket_endpoint(websocket: WebSocket, assembly_id: str):
                     continue
 
                 # validar rol
-                if user.role not in [
-                    UserRole.ASSEMBLY_MEMBER,
-                    UserRole.ADMIN
-                ]:
+                if membership.role not in ["PRESIDENT", "MEMBER"]:
                     await websocket.send_json({
                         "type": "error",
                         "message": "No autorizado"
@@ -351,7 +356,11 @@ async def websocket_endpoint(websocket: WebSocket, assembly_id: str):
                     votes_detail.append({
                         "user_id": str(v.user_id),
                         "vote": val,
-                        "party": getattr(v.user, "party", "SIN_GRUPO")
+                        member = db.query(Membership).filter(
+                        Membership.user_id == v.user_id,
+                        Membership.assembly_id == assembly_uuid
+                        ).first()
+                        "group": member.group if member else "SIN_GRUPO"
                     })
 
                 await manager.broadcast(
